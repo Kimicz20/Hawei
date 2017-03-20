@@ -1,0 +1,51 @@
+package com.lab603.module;
+
+import java.util.List;
+
+public class Net {
+	boolean[][] conected;
+	List<Node> nodes;
+	List<Tran> trans;
+	List<CostNode> costNodes;
+	int serverCost;
+	
+	public Net(boolean[][] conected, List<Node> nodes, List<Tran> trans, List<CostNode> costNodes, int serverCost) {
+		super();
+		this.conected = conected;
+		this.nodes = nodes;
+		this.trans = trans;
+		this.costNodes = costNodes;
+		this.serverCost = serverCost;
+	}
+	public boolean[][] getConected() {
+		return conected;
+	}
+	public void setConected(boolean[][] conected) {
+		this.conected = conected;
+	}
+	public List<CostNode> getCostNodes() {
+		return costNodes;
+	}
+	public void setCostNodes(List<CostNode> costNodes) {
+		this.costNodes = costNodes;
+	}
+	public int getServerCost() {
+		return serverCost;
+	}
+	public void setServerCost(int serverCost) {
+		this.serverCost = serverCost;
+	}
+	public List<Node> getNodes() {
+		return nodes;
+	}
+	public void setNodes(List<Node> nodes) {
+		this.nodes = nodes;
+	}
+	public List<Tran> getTrans() {
+		return trans;
+	}
+	public void setTrans(List<Tran> trans) {
+		this.trans = trans;
+	}
+	
+}
