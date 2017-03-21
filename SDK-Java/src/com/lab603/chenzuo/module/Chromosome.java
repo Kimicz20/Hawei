@@ -6,9 +6,7 @@ package com.lab603.chenzuo.module;
 *	score:基因对应的适应度（函数值）
 */
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 public class Chromosome {
@@ -36,14 +34,25 @@ public class Chromosome {
 	 *            随机生成基因序列
 	 */
 	public Chromosome(int size) {
+		int i,j;
 		Random random = new Random(System.currentTimeMillis());
 		if (size <= 0) {
 			return;
 		}
 		initGeneSize(size);
 
-		for (int i = 0; i < size; i++) {
+		gene[0] = random.nextInt(65535) % size;
+		for (i = 1; i < size;)// 染色体长度
+		{
 			gene[i] = random.nextInt(65535) % size;
+			for (j = 0; j < i; j++) {
+				if (gene[i] == gene[j]) {
+					break;
+				}
+			}
+			if (j == i) {
+				i++;
+			}
 		}
 	}
 

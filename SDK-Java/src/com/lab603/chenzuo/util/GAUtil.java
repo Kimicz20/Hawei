@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.lab603.chenzuo.module.Chromosome;
@@ -17,15 +18,14 @@ public class GAUtil {
 	 * @param fileName
 	 * @return
 	 */
-	public static String[] readFile(String fileName){
-		String[] strbuff = null;
+	public static List<String> readFile(String fileName){
+		List<String> strbuff = new ArrayList<String>();
 		String s;
-		int i=0;
 		BufferedReader data = null;
 		 try {
 			data = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
 			while ((s = data.readLine()) != null) {
-				strbuff[i++] = s;
+				strbuff.add(s);
 			 }
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -38,8 +38,9 @@ public class GAUtil {
 	 * @return
 	 * @throws IOException 
 	 */
-	public static int[][] distanceBuild(String[] strbuff){
-		int cityNum = strbuff.length;
+	public static int[][] distanceBuild(List<String> strbuff){
+		int cityNum = strbuff.size();
+		System.out.println("cityNum : "+cityNum);
 		// 距离矩阵
 		int[][] distance; 
 		// 读取数据
@@ -50,7 +51,7 @@ public class GAUtil {
 		y = new int[cityNum];
 		for (int i = 0; i < cityNum; i++) {
 			// 字符分割
-			String[] strcol = strbuff[i].split(" ");
+			String[] strcol = strbuff.get(i).split(" ");
 			x[i] = Integer.valueOf(strcol[1]);// x坐标
 			y[i] = Integer.valueOf(strcol[2]);// y坐标
 		}
@@ -72,6 +73,12 @@ public class GAUtil {
 				}
 			}
 		distance[cityNum - 1][cityNum - 1] = 0;
+//		for (int i = 0; i < cityNum; i++) {
+//			for (int j = 0; j < cityNum; j++) {
+//				System.out.print(distance[i][j] + ",");
+//			}
+//			System.out.println();
+//		}
 		return distance;
 	}
 
@@ -108,7 +115,7 @@ public class GAUtil {
 	 * @Description: 计算种群中各个个体的累积概率， 前提是已经计算出各个个体的适应度fitness[max]
 	 *               作为赌轮选择策略一部分，Pi[max]
 	 */
-	public static float[] countRate(int scale ,int[] fitness, List<Chromosome> oldPopulation) {
+	public static float[] evaluateRate(int scale ,int[] fitness, List<Chromosome> oldPopulation) {
 		int k;
 		double sumFitness = 0;// 适应度总和
 		float[] Pi = new float[scale];

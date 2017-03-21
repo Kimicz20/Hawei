@@ -1,6 +1,7 @@
 package com.lab603.chenzuo.module;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.lab603.chenzuo.util.GAUtil;
 
@@ -39,9 +40,9 @@ public class Net {
 	}
 
 	public void init(String fileName) {
-		String[] tmp = GAUtil.readFile(fileName);
-		this.cityNum = tmp.length;
-		this.bestTour = new int[tmp.length + 1];
+		List<String> tmp = GAUtil.readFile(fileName);
+		this.cityNum = tmp.size();
+		this.bestTour = new int[tmp.size() + 1];
 		this.distance = GAUtil.distanceBuild(tmp);
 	}
 	

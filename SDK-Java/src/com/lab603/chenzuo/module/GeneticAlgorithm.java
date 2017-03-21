@@ -3,6 +3,7 @@ package com.lab603.chenzuo.module;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -73,7 +74,7 @@ public class GeneticAlgorithm {
 	 */
 	private void initGroup() {
 		for (int i = 0; i < scale; i++) {
-			Chromosome chro = new Chromosome();
+			Chromosome chro = new Chromosome(net.getCityNum());
 			oldPopulation.add(chro);
 		}
 	}
@@ -85,20 +86,30 @@ public class GeneticAlgorithm {
 	public void evolve() {
 		// 1.初始化种群
 		initGroup();
-		// 2.计算初始化种群中各个个体的累积概率，Pi[max]
+		// 2.计算种群适应度
 		fitness = GAUtil.evaluateFitness(scale, net, oldPopulation);
-		Pi = GAUtil.countRate(scale,fitness, oldPopulation);
+		// 3.计算种群中各个个体的累积概率
+		Pi = GAUtil.evaluateRate(scale,fitness, oldPopulation);
 		System.out.println("初始种群...");
-		// 3.遗传迭代
+//		for (int k = 0; k < scale; k++) {
+//			System.out.println(oldPopulation.get(k));
+//			System.out.println("----" + fitness[k] + " " + Pi[k]);
+//		}
+		// 4.遗传迭代
 		for (t = 0; t < MAX_GEN; t++) {
 			// 4.1 生成下一代种群
 			evolution();
 			// 4.2 将新种群newGroup复制到旧种群oldGroup中，准备下一代进化
+			showList();
 			oldPopulation.clear();
-			oldPopulation = newPopulation;
+			for(Chromosome s : newPopulation){
+				oldPopulation.add(s);
+			}
 			newPopulation.clear();
-			// 计算种群中各个个体的累积概率
+			// 4.3 计算种群适应度
 			fitness = GAUtil.evaluateFitness(scale, net, oldPopulation);
+			// 4.4 计算种群中各个个体的累积概率
+			Pi = GAUtil.evaluateRate(scale,fitness, oldPopulation);
 		}
 		printf();
 	}
@@ -122,15 +133,14 @@ public class GeneticAlgorithm {
 		for (k = 1; k + 1 < scale / 2; k = k + 2) {
 			r = random.nextFloat();// /产生概率
 			if (r < Pc) {
-				OXCross1(k, k + 1);// 进行交叉
-				// OXCross(k,k+1);//进行交叉
+				OXCross(k, k + 1);// 进行交叉
 			} else {
-				r = random.nextFloat();// /产生概率
+				r = random.nextFloat();//产生概率
 				// 变异
 				if (r < Pm) {
 					OnCVariation(k);
 				}
-				r = random.nextFloat();// /产生概率
+				r = random.nextFloat();//产生概率
 				// 变异
 				if (r < Pm) {
 					OnCVariation(k + 1);
@@ -193,7 +203,7 @@ public class GeneticAlgorithm {
 	}
 
 	// 交叉算子,相同染色体交叉产生不同子代染色体
-	public void OXCross1(int k1, int k2) {
+	public void OXCross(int k1, int k2) {
 		int i, j, k, flag;
 		int ran1, ran2, temp;
 		int[] Gh1 = new int[cityNum];
@@ -284,14 +294,23 @@ public class GeneticAlgorithm {
 	 */
 	private void printf() {
 		System.out.println("最后种群...");
-		for (Chromosome i : oldPopulation) {
-			System.out.println(i);
-		}
+		System.out.println(oldPopulation.get(0));
 		System.out.println("最佳长度出现代数：");
 		System.out.println(bestT);
 		System.out.println("最佳长度");
 		System.out.println(net.getBestLength());
 		System.out.println("最佳路径：");
 		System.out.println(Arrays.toString(net.getBestTour()));
+	}
+	
+	private void showList() {
+		System.out.println("...原种群...");
+		for(Chromosome chromosome :oldPopulation){
+			System.out.println(chromosome);
+		}
+		System.out.println("...新种群...");
+		for(Chromosome chromosome : newPopulation){
+			System.out.println(chromosome);
+		}
 	}
 }
