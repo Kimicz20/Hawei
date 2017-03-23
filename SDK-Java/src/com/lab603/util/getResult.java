@@ -24,14 +24,12 @@ public class getResult {
 		MinCostFlow m = new MinCostFlow(net);
 		m.TransNet2Flow();
 		m.setServer(ids);
-		System.out.println(m.min_cost_flow()); 
-		
-		ResultPathsAndCost resultPathsAndCost = new ResultPathsAndCost(null, null);
-		return transReultToStrings(resultPathsAndCost);
+		return transReultToStrings(m.min_cost_flow());
 		
 	}
 
 	private static String[] transReultToStrings(ResultPathsAndCost resultPathsAndCost) {
-		return null;
+		System.out.println(resultPathsAndCost);
+		return new String[2];
 	}
 }

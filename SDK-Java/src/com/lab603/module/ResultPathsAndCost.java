@@ -5,8 +5,13 @@ import java.util.List;
 public class ResultPathsAndCost {
 	
 	List<List<Integer>> paths;
-	List<Integer> costs;
-	public ResultPathsAndCost(List<List<Integer>> paths, List<Integer> costs) {
+	int costs;
+	
+	public ResultPathsAndCost() {
+	}
+	
+	public ResultPathsAndCost(List<List<Integer>> paths, int costs) {
+		super();
 		this.paths = paths;
 		this.costs = costs;
 	}
@@ -16,11 +21,23 @@ public class ResultPathsAndCost {
 	public void setPaths(List<List<Integer>> paths) {
 		this.paths = paths;
 	}
-	public List<Integer> getCosts() {
+	public int getCosts() {
 		return costs;
 	}
-	public void setCosts(List<Integer> costs) {
+	public void setCosts(int costs) {
 		this.costs = costs;
 	}
+
+	@Override
+	public String toString() {
+		String tmp = "总花费: "+costs+"\n";
+		for(List<Integer> s:paths){
+			for(int i:s)
+				tmp+=i+" ";
+			tmp+="\n";
+		}
+		return tmp;
+	}
+	
 	
 }

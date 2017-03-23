@@ -1,11 +1,14 @@
 package com.lab603.yj.module;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 
 import com.lab603.module.CostNode;
 import com.lab603.module.Net;
+import com.lab603.module.ResultPathsAndCost;
 import com.lab603.module.Tran;
 import com.lab603.yj.util.MyPriorityQueue;
 import com.lab603.yj.util.Pair;
@@ -41,7 +44,7 @@ public class MinCostFlow {
 	int[] prevv = new int[MAX_V];
 	int[] preve = new int[MAX_V];
 
-	List<String> paths;
+	List<List<Integer>> paths = new ArrayList<List<Integer>>();
 
 	/***
 	 * add eage to Graph array
@@ -105,7 +108,8 @@ public class MinCostFlow {
 		}
 	}
 	
-	public int min_cost_flow() {
+	public ResultPathsAndCost min_cost_flow() {
+		paths.clear();
 		int res = 0;
 
 		for (int i = 0; i < nodeNum; i++) {
@@ -140,7 +144,7 @@ public class MinCostFlow {
 
 			// extended end
 			if (dist[superSink] == INF) {
-				return -totalFlow;
+				return new ResultPathsAndCost(paths,-totalFlow);
 			}
 			for (int v = 0; v < nodeNum; v++) {
 				h[v] += dist[v];
@@ -149,30 +153,30 @@ public class MinCostFlow {
 			// The shortest path from s to t is augmented
 			int d = totalFlow;
 
-//			List<Integer> shortIndex = new ArrayList<>();
-//			String path = "";
+			List<Integer> shortIndex = new ArrayList<>();
 			/* Compared with the minimum capacity of the residual demand flow
 			 and the shortest path, the minimum is the augmented flow*/
 			for (int v = superSink; v != superSource; v = prevv[v]) {
 				if (d > G.get(prevv[v]).get(preve[v]).getCap())
 					d = G.get(prevv[v]).get(preve[v]).getCap();
 				// save shortest path
-//				if (v != superSink) {
-//					shortIndex.add(v);
-//				}
+				if (v != superSink) {
+					shortIndex.add(v);
+				}
 			}
-
+			Collections.reverse(shortIndex);
+			shortIndex.add(d);
 //			for (int k = shortIndex.size() - 1; k >= 0; k--) {
 //				int tm = 0;
 //				if (k != 0) {
 //					tm = shortIndex.get(k);
 //				} else {
-//					tm = shortIndex.get(k) - nodeNum;
+//					tm = shortIndex.get(k) - netStates;
 //				}
-//				path += superSink + " ";
+//				path += tm + " ";
 //			}
 //			path += d;
-//			shortPaths.add(path);
+			paths.add(shortIndex);
 
 			totalFlow -= d;
 			res += d * h[superSink];
@@ -183,7 +187,7 @@ public class MinCostFlow {
 			}
 
 		}
-		return res;
+		return new ResultPathsAndCost(paths,res);
 	}
 
 	public MinCostFlow(Net net) {
