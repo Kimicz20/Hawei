@@ -1,8 +1,8 @@
 package com.lab603.jun.util.dj;
 
 public class PreNode {  
-    private int preNodeNum;// 最优 前一个节点  
-    private int nodeStep;// 最小步长  
+    private int preNodeNum;
+    private int nodeStep;
   
     public PreNode(int preNodeNum, int nodeStep) {  
         this.preNodeNum = preNodeNum;  

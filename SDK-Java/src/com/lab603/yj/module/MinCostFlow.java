@@ -3,74 +3,130 @@ package com.lab603.yj.module;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+
+import com.lab603.module.CostNode;
+import com.lab603.module.Net;
+import com.lab603.module.Tran;
 import com.lab603.yj.util.MyPriorityQueue;
 import com.lab603.yj.util.Pair;
 
 public class MinCostFlow {
+
+	private Net net;
 	
 	private int INF = 0x3f3f3f3f;
+
+	private int totalFlow = 0; 	
 	
-	//最大顶点数
+	// MAX node number
 	private static int MAX_V = 2000;
+
+	// Node number
+	private int nodeNum;
 	
-	//顶点数
-	private int V;
+	int superSource, superSink;
 	
-	//图的邻接表
-	List<List<Edge>> G ;
-	//顶点的势
+	int netStates, netRoutes, consumeStates;
+	
+	// Graph array
+	List<List<Edge>> G;
+
+	// Node h
 	int[] h = new int[MAX_V];
-	//最短距离
+
+	// Short distance
 	int[] dist = new int[MAX_V];
-	//最短路中的前驱节点和对应的边
+
+	// pre node and eadge of short distance
 	int[] prevv = new int[MAX_V];
-	int[] preve = new int[MAX_V]; 
+	int[] preve = new int[MAX_V];
+
+	List<String> paths;
 
 	/***
-	 * 向邻接表中添加 边
+	 * add eage to Graph array
+	 * 
 	 * @param from
-	 * 		起点
+	 * 
 	 * @param to
-	 * 		终点
+	 * 
 	 * @param cap
-	 * 		容量
+	 * 
 	 * @param cost
-	 * 		费用
+	 * 
 	 */
 	public void add_edge(int from, int to, int cap, int cost) {
-		G.get(from).add(new Edge(to, cap,cost, G.get(to).size()));
-		G.get(to).add(new Edge(from, 0,-cost, G.get(from).size()-1));
+		G.get(from).add(new Edge(to, cap, cost, G.get(to).size()));
+		G.get(to).add(new Edge(from, 0, -cost, G.get(from).size() - 1));
 	}
-	/**
-	 * 最小费用流算法
-	 * @param s
-	 * @param t
-	 * @param f
-	 * @return
-	 */
-	int min_cost_flow(int s, int t, int f) {
-		int res = 0;
-		//初始化h
+
+	public void TransNet2Flow() {
 		
-		for(int i=0;i<V;i++){
-			h[i]=0;
+		netStates = net.getNodes().size();
+
+		netRoutes = net.getTrans().size();
+
+		consumeStates = net.getCostNodes().size();
+
+		init(netStates + consumeStates + 2);
+
+		for (Tran t : net.getTrans()) {
+			int start = t.getFromNodeID();
+			int end = t.getToNodeID();
+			int cap = t.getMaxValue();
+			int cost = t.getCostValue();
+
+			add_edge(start, end, cap, cost);
+			add_edge(end, start, cap, cost);
 		}
-		while (f > 0) {
-			// Dijkstra更新h
+
+		for (CostNode c : net.getCostNodes()) {
+			int start = c.getId();
+			int end = c.getLinkedNodeId();
+			int cap = c.getRequestValue();
+			totalFlow += cap;
+			add_edge(start, end, cap, 0);
+			add_edge(end, start, cap, 0);
+		}
+	}
+	
+	public void setServer(List<Integer> serverIndex) {
+		
+		superSource = netStates + consumeStates;
+		superSink = superSource + 1;
+		
+		for (int i = 0; i < serverIndex.size(); i++) {
+			add_edge(superSource, serverIndex.get(i), 600, 0);
+			add_edge(serverIndex.get(i), superSource, 600, 0);
+		}
+		for (int i = netStates; i < netStates + consumeStates; i++) {
+			add_edge(superSink, i, 600, 0);
+			add_edge(i, superSink, 600, 0);
+		}
+	}
+	
+	public int min_cost_flow() {
+		int res = 0;
+
+		for (int i = 0; i < nodeNum; i++) {
+			h[i] = 0;
+		}
+		while (totalFlow > 0) {
+			// Dijkstra update h
 			Queue<Pair> que = MyPriorityQueue.getPriorityQueue();
-			for(int i=0;i<V;i++){
-				dist[i]=INF;
+			for (int i = 0; i < nodeNum; i++) {
+				dist[i] = INF;
 			}
-			dist[s] = 0;
-			que.add(new Pair(0,s));
-			
+			dist[superSource] = 0;
+			que.add(new Pair(0, superSource));
+
 			while (!que.isEmpty()) {
 				Pair p = que.peek();
 				que.poll();
 				int v = p.getSecond();
 				if (dist[v] < p.getFirst())
 					continue;
-				
+
 				for (int i = 0; i < G.get(v).size(); i++) {
 					Edge e = G.get(v).get(i);
 					if (e.getCap() > 0 && dist[e.getTo()] > dist[v] + e.getCost() + h[v] - h[e.getTo()]) {
@@ -82,24 +138,45 @@ public class MinCostFlow {
 				}
 			}
 
-			//不能再增广了
-			if (dist[t] == INF) {
-				//更改
-				return -f;
+			// extended end
+			if (dist[superSink] == INF) {
+				return -totalFlow;
 			}
-			for (int v = 0; v < V; v++) {
-				h[v] +=  dist[v];
+			for (int v = 0; v < nodeNum; v++) {
+				h[v] += dist[v];
 			}
-			
-			//从s到t的最短路尽量增广
-			int d = f;
-			for (int v = t; v != s; v = prevv[v]) {
-				if(d > G.get(prevv[v]).get(preve[v]).getCap())
+
+			// The shortest path from s to t is augmented
+			int d = totalFlow;
+
+//			List<Integer> shortIndex = new ArrayList<>();
+//			String path = "";
+			/* Compared with the minimum capacity of the residual demand flow
+			 and the shortest path, the minimum is the augmented flow*/
+			for (int v = superSink; v != superSource; v = prevv[v]) {
+				if (d > G.get(prevv[v]).get(preve[v]).getCap())
 					d = G.get(prevv[v]).get(preve[v]).getCap();
+				// save shortest path
+//				if (v != superSink) {
+//					shortIndex.add(v);
+//				}
 			}
-			f -= d;
-			res += d * h[t];
-			for (int v = t; v != s; v = prevv[v]) {
+
+//			for (int k = shortIndex.size() - 1; k >= 0; k--) {
+//				int tm = 0;
+//				if (k != 0) {
+//					tm = shortIndex.get(k);
+//				} else {
+//					tm = shortIndex.get(k) - nodeNum;
+//				}
+//				path += superSink + " ";
+//			}
+//			path += d;
+//			shortPaths.add(path);
+
+			totalFlow -= d;
+			res += d * h[superSink];
+			for (int v = superSink; v != superSource; v = prevv[v]) {
 				Edge e = G.get(prevv[v]).get(preve[v]);
 				e.setCap(e.getCap() - d);
 				G.get(v).get(e.getRev()).setCap(G.get(v).get(e.getRev()).getCap() + d);
@@ -109,28 +186,16 @@ public class MinCostFlow {
 		return res;
 	}
 
-	public MinCostFlow() {
-		super();
+	public MinCostFlow(Net net) {
+		this.net = net;
 	}
-	public int getV() {
-		return V;
-	}
-	public void setV(int v) {
-		V = v;
-		init();
-	}
-	public void init(){
+
+	public void init(int v) {
+		nodeNum = v;
 		G = new ArrayList<List<Edge>>();
-		for(int i=0;i<V;i++){
+		for (int i = 0; i < nodeNum; i++) {
 			G.add(new ArrayList<Edge>());
 		}
 	}
-	public void printf(){
-		for(int i=0;i<V;i++){
-			List<Edge> l = G.get(i);
-			for(Edge e:l){
-				System.out.println(e);
-			}
-		}
-	}
+
 }

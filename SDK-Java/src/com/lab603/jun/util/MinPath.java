@@ -1,6 +1,5 @@
 package com.lab603.jun.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -8,7 +7,6 @@ import com.lab603.jun.util.dj.DistanceDijkstraImpl;
 import com.lab603.jun.util.dj.MinStep;
 import com.lab603.module.CostNode;
 import com.lab603.module.Net;
-import com.lab603.module.Node;
 import com.lab603.module.Tran;
 
 public class MinPath {

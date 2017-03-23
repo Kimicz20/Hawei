@@ -1,6 +1,5 @@
 package com.lab603.module;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ResultPathsAndCost {

@@ -3,9 +3,9 @@ package com.lab603.jun.util.dj;
 import java.util.List;
 
 public class MinStep {  
-    private boolean reachable;//是否可达  
-    private int minStep;//最短步长  
-    private List<Integer> step;//最短路径  
+    private boolean reachable; 
+    private int minStep; 
+    private List<Integer> step;
   
     public MinStep() {  
     }  

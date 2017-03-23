@@ -14,7 +14,7 @@ import com.lab603.util.TransStringToModule;
 public class TestCase {
 	private static Net net;
 	public static void main(String args[]) throws IOException {
-		FileReader fr = new FileReader("case0.txt");
+		FileReader fr = new FileReader("data.txt");
 		BufferedReader br = new BufferedReader(fr);
         String s;
         StringBuilder sb = new StringBuilder();
