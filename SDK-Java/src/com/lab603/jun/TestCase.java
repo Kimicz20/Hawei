@@ -15,7 +15,7 @@ public class TestCase {
 	private static Net net;
 	public static void main(String args[]) throws IOException {
 		FileReader fr = new FileReader("case0.txt");
-		 BufferedReader br = new BufferedReader(fr);
+		BufferedReader br = new BufferedReader(fr);
         String s;
         StringBuilder sb = new StringBuilder();
         ArrayList<String> strings = new ArrayList<>();
@@ -25,12 +25,15 @@ public class TestCase {
         }
 
 	    br.close();
+	    
 	    String[] input = new String[strings.size()];
 	    for(int i = 0; i < input.length; i++) {
 	    	input[i] = strings.get(i);
 	    }
+	  
 	    
-		String[] out = Deploy.deployServer(input);
+	    
+		String[] out = Deploy.deployServer(input);///
 		
 		for (String string : out) {
 			System.out.println(string);

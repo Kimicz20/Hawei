@@ -8,7 +8,7 @@ public class Net {
 	List<Tran> trans;
 	List<CostNode> costNodes;
 	int serverCost;
-	
+	int allNodeSize;
 	public Net(boolean[][] conected, List<Node> nodes, List<Tran> trans, List<CostNode> costNodes, int serverCost) {
 		super();
 		this.conected = conected;
@@ -16,7 +16,17 @@ public class Net {
 		this.trans = trans;
 		this.costNodes = costNodes;
 		this.serverCost = serverCost;
+		this.allNodeSize = nodes.size() + costNodes.size();
 	}
+	
+	public int getAllNodeSize() {
+		return allNodeSize;
+	}
+
+	public void setAllNodeSize(int allNodeSize) {
+		this.allNodeSize = allNodeSize;
+	}
+
 	public boolean[][] getConected() {
 		return conected;
 	}

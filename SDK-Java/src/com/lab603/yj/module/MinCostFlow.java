@@ -1,11 +1,10 @@
 package com.lab603.yj.module;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
+import com.lab603.yj.util.MyPriorityQueue;
+import com.lab603.yj.util.Pair;
 
 public class MinCostFlow {
 	
@@ -18,13 +17,14 @@ public class MinCostFlow {
 	private int V;
 	
 	//图的邻接表
-	Map<Integer,List<Edge>> G = new HashMap<Integer,List<Edge>>();
+	List<List<Edge>> G ;
 	//顶点的势
-	int[] h;
+	int[] h = new int[MAX_V];
 	//最短距离
-	int[] dist;
+	int[] dist = new int[MAX_V];
 	//最短路中的前驱节点和对应的边
-	int[] prevv, preve;
+	int[] prevv = new int[MAX_V];
+	int[] preve = new int[MAX_V]; 
 
 	/***
 	 * 向邻接表中添加 边
@@ -38,12 +38,8 @@ public class MinCostFlow {
 	 * 		费用
 	 */
 	public void add_edge(int from, int to, int cap, int cost) {
-		List<Edge> edges = new ArrayList<>();
-		edges.add(new Edge(to, cap,cost, G.get(to).size()));
-		G.put(from, edges);
-		edges.clear();
-		edges.add(new Edge(from, 0,-cost, G.get(from).size()-1));
-		G.put(to, edges);
+		G.get(from).add(new Edge(to, cap,cost, G.get(to).size()));
+		G.get(to).add(new Edge(from, 0,-cost, G.get(from).size()-1));
 	}
 	/**
 	 * 最小费用流算法
@@ -55,25 +51,29 @@ public class MinCostFlow {
 	int min_cost_flow(int s, int t, int f) {
 		int res = 0;
 		//初始化h
-		h = new int[V];
 		
+		for(int i=0;i<V;i++){
+			h[i]=0;
+		}
 		while (f > 0) {
 			// Dijkstra更新h
-			Queue<Pair> que = new LinkedList<Pair>();
-			dist = new int[V];
+			Queue<Pair> que = MyPriorityQueue.getPriorityQueue();
+			for(int i=0;i<V;i++){
+				dist[i]=INF;
+			}
 			dist[s] = 0;
 			que.add(new Pair(0,s));
-
+			
 			while (!que.isEmpty()) {
 				Pair p = que.peek();
 				que.poll();
 				int v = p.getSecond();
 				if (dist[v] < p.getFirst())
 					continue;
-
+				
 				for (int i = 0; i < G.get(v).size(); i++) {
 					Edge e = G.get(v).get(i);
-					if (e.getCap() > 0 && (dist[e.getTo()] > (dist[v] + e.getCost() + h[v] - h[e.getTo()]))) {
+					if (e.getCap() > 0 && dist[e.getTo()] > dist[v] + e.getCost() + h[v] - h[e.getTo()]) {
 						dist[e.getTo()] = dist[v] + e.getCost() + h[v] - h[e.getTo()];
 						prevv[e.getTo()] = v;
 						preve[e.getTo()] = i;
@@ -86,39 +86,29 @@ public class MinCostFlow {
 			if (dist[t] == INF) {
 				//更改
 				return -f;
-				//return -1;
 			}
-
 			for (int v = 0; v < V; v++) {
 				h[v] +=  dist[v];
 			}
-
+			
 			//从s到t的最短路尽量增广
 			int d = f;
 			for (int v = t; v != s; v = prevv[v]) {
 				if(d > G.get(prevv[v]).get(preve[v]).getCap())
 					d = G.get(prevv[v]).get(preve[v]).getCap();
 			}
-
 			f -= d;
 			res += d * h[t];
 			for (int v = t; v != s; v = prevv[v]) {
 				Edge e = G.get(prevv[v]).get(preve[v]);
 				e.setCap(e.getCap() - d);
-				e.setCap(G.get(v).get(e.getRev()).getCap() + d);
+				G.get(v).get(e.getRev()).setCap(G.get(v).get(e.getRev()).getCap() + d);
 			}
 
 		}
 		return res;
 	}
 
-	void init() {
-		//这里假设节点从0编号
-		for (int i = 0; i < V; i++) {
-			G.get(i).clear();
-		}
-		V = 0;
-	}
 	public MinCostFlow() {
 		super();
 	}
@@ -127,7 +117,20 @@ public class MinCostFlow {
 	}
 	public void setV(int v) {
 		V = v;
+		init();
 	}
-	
-	
+	public void init(){
+		G = new ArrayList<List<Edge>>();
+		for(int i=0;i<V;i++){
+			G.add(new ArrayList<Edge>());
+		}
+	}
+	public void printf(){
+		for(int i=0;i<V;i++){
+			List<Edge> l = G.get(i);
+			for(Edge e:l){
+				System.out.println(e);
+			}
+		}
+	}
 }

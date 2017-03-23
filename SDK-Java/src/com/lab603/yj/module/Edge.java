@@ -50,6 +50,9 @@ public class Edge {
 	public void setRev(int rev) {
 		this.rev = rev;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "edge [" + to + "," + cap + "," + cost + "," + rev + "]";
+	}
 }

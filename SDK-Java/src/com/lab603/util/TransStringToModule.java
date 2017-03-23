@@ -42,7 +42,7 @@ public class TransStringToModule {
 		ArrayList<CostNode> costNodes = new ArrayList<>(costNodeCount);
 		for(; index < 5 + tranCount + costNodeCount; index++) {
 			String[] costNodeDataString = input[index].split(" ");
-			int id = Integer.valueOf(costNodeDataString[0]);
+			int id = Integer.valueOf(costNodeDataString[0]) + nodeCount;
 			int linkedNodeId = Integer.valueOf(costNodeDataString[1]);
 			int requestValue = Integer.valueOf(costNodeDataString[2]);
 			CostNode costNode = new CostNode(id, linkedNodeId, requestValue);
