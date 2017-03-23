@@ -164,18 +164,9 @@ public class MinCostFlow {
 					shortIndex.add(v);
 				}
 			}
+			shortIndex.set(0, shortIndex.get(0)-netStates);
 			Collections.reverse(shortIndex);
 			shortIndex.add(d);
-//			for (int k = shortIndex.size() - 1; k >= 0; k--) {
-//				int tm = 0;
-//				if (k != 0) {
-//					tm = shortIndex.get(k);
-//				} else {
-//					tm = shortIndex.get(k) - netStates;
-//				}
-//				path += tm + " ";
-//			}
-//			path += d;
 			paths.add(shortIndex);
 
 			totalFlow -= d;
