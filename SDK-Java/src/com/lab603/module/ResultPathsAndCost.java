@@ -30,11 +30,15 @@ public class ResultPathsAndCost {
 
 	@Override
 	public String toString() {
-		String tmp = "总花费: "+costs+"\n";
-		for(List<Integer> s:paths){
-			for(int i:s)
-				tmp+=i+" ";
-			tmp+="\n";
+		String tmp = paths.size()+"\n\n";
+		for(int j=0;j<paths.size();j++){
+			List<Integer> s = paths.get(j);
+			for(int i=0;i<s.size()-1;i++)
+				tmp+=s.get(i)+" ";
+			if(j == paths.size()-1)
+				tmp+=s.get(s.size()-1);
+			else
+				tmp+=s.get(s.size()-1)+"\n";
 		}
 		return tmp;
 	}

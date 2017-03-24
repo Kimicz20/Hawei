@@ -1,15 +1,12 @@
 package com.lab603.jun;
 
-import java.awt.List;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import com.cacheserverdeploy.deploy.Deploy;
-import com.lab603.module.CostNode;
 import com.lab603.module.Net;
-import com.lab603.util.TransStringToModule;
 
 public class TestCase {
 	private static Net net;
@@ -20,7 +17,7 @@ public class TestCase {
         StringBuilder sb = new StringBuilder();
         ArrayList<String> strings = new ArrayList<>();
         while ((s = br.readLine()) != null) {
-            System.out.println(s);
+//            System.out.println(s);
             strings.add(s);
         }
 

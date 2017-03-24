@@ -1,7 +1,13 @@
 package com.lab603.yj.module;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
@@ -13,7 +19,8 @@ import com.lab603.module.Tran;
 import com.lab603.yj.util.MyPriorityQueue;
 import com.lab603.yj.util.Pair;
 
-public class MinCostFlow {
+@SuppressWarnings("serial")
+public class MinCostFlow implements Serializable{
 
 	private Net net;
 	
@@ -31,6 +38,8 @@ public class MinCostFlow {
 	
 	int netStates, netRoutes, consumeStates;
 	
+	int serverNum;
+	
 	// Graph array
 	List<List<Edge>> G;
 
@@ -40,12 +49,24 @@ public class MinCostFlow {
 	// Short distance
 	int[] dist = new int[MAX_V];
 
-	// pre node and eadge of short distance
+	// pre node and edge of short distance
 	int[] prevv = new int[MAX_V];
 	int[] preve = new int[MAX_V];
 
 	List<List<Integer>> paths = new ArrayList<List<Integer>>();
 
+	
+	public Object deepClone() throws IOException, OptionalDataException, ClassNotFoundException {
+		// 将对象写到流里
+		ByteArrayOutputStream bo = new ByteArrayOutputStream();
+		ObjectOutputStream oo = new ObjectOutputStream(bo);
+		oo.writeObject(this);
+		// 从流里读出来
+		ByteArrayInputStream bi = new ByteArrayInputStream(bo.toByteArray());
+		ObjectInputStream oi = new ObjectInputStream(bi);
+		return (oi.readObject());
+	}
+	
 	/***
 	 * add eage to Graph array
 	 * 
@@ -94,11 +115,11 @@ public class MinCostFlow {
 	}
 	
 	public void setServer(List<Integer> serverIndex) {
-		
+		serverNum = serverIndex.size();
 		superSource = netStates + consumeStates;
 		superSink = superSource + 1;
 		
-		for (int i = 0; i < serverIndex.size(); i++) {
+		for (int i = 0; i < serverNum; i++) {
 			add_edge(superSource, serverIndex.get(i), 600, 0);
 			add_edge(serverIndex.get(i), superSource, 600, 0);
 		}
@@ -178,7 +199,7 @@ public class MinCostFlow {
 			}
 
 		}
-		return new ResultPathsAndCost(paths,res);
+		return new ResultPathsAndCost(paths,res+serverNum*net.getServerCost());
 	}
 
 	public MinCostFlow(Net net) {

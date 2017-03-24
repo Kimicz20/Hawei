@@ -20,8 +20,13 @@ public class TransStringToModule {
 		int tranCount = Integer.valueOf(countString[1]);
 		int costNodeCount = Integer.valueOf(countString[2]);
 		
-		boolean[][] connected = new boolean[nodeCount][nodeCount];
-		
+		// set nodes first
+		ArrayList<Node> nodes = new ArrayList<>(nodeCount);
+		for(int i = 0; i < nodeCount; i++) {
+			Node node = new Node(i);
+			nodes.add(node);
+		}
+				
 		index++;
 		int serverCost = Integer.valueOf(input[index++]);
 		index++;
@@ -33,11 +38,14 @@ public class TransStringToModule {
 			int toNodeID = Integer.valueOf(tranDataString[1]);
 			int maxValue = Integer.valueOf(tranDataString[2]);
 			int costValue = Integer.valueOf(tranDataString[3]);
-			connected[fromNodeID][toNodeID] = true;
 			Tran tran = new Tran(fromNodeID, toNodeID, maxValue, costValue);
 			trans.add(tran);
+			nodes.get(fromNodeID).addThroughput(maxValue);
+			nodes.get(toNodeID).addThroughput(maxValue);
 		}
 		
+		
+		int totalResquestValue = 0;
 		index++;
 		ArrayList<CostNode> costNodes = new ArrayList<>(costNodeCount);
 		for(; index < 5 + tranCount + costNodeCount; index++) {
@@ -47,15 +55,12 @@ public class TransStringToModule {
 			int requestValue = Integer.valueOf(costNodeDataString[2]);
 			CostNode costNode = new CostNode(id, linkedNodeId, requestValue);
 			costNodes.add(costNode);
+			totalResquestValue += requestValue;
 		}
 		
-		ArrayList<Node> nodes = new ArrayList<>(nodeCount);
-		for(int i = 0; i < nodeCount; i++) {
-			Node node = new Node(i, false);
-			nodes.add(node);
-		}
 		
-		Net net = new Net(connected, nodes, trans, costNodes, serverCost);
+		
+		Net net = new Net(nodes, trans, costNodes, serverCost, totalResquestValue);
 		return net; 
 		
 	}

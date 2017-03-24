@@ -45,6 +45,4 @@ public class Tran {
 	public void setCostValue(int costValue) {
 		this.costValue = costValue;
 	}
-	
-	
 }

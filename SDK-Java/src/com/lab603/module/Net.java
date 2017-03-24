@@ -3,22 +3,33 @@ package com.lab603.module;
 import java.util.List;
 
 public class Net {
-	boolean[][] conected;
 	List<Node> nodes;
 	List<Tran> trans;
 	List<CostNode> costNodes;
 	int serverCost;
 	int allNodeSize;
-	public Net(boolean[][] conected, List<Node> nodes, List<Tran> trans, List<CostNode> costNodes, int serverCost) {
+	int totalRequestValue;
+	public Net(List<Node> nodes, List<Tran> trans, List<CostNode> costNodes, int serverCost, int totalRequestValue) {
 		super();
-		this.conected = conected;
 		this.nodes = nodes;
 		this.trans = trans;
 		this.costNodes = costNodes;
 		this.serverCost = serverCost;
 		this.allNodeSize = nodes.size() + costNodes.size();
+		this.totalRequestValue = totalRequestValue;
 	}
 	
+	
+	public int getTotalRequestValue() {
+		return totalRequestValue;
+	}
+
+
+	public void setTotalRequestValue(int totalRequestValue) {
+		this.totalRequestValue = totalRequestValue;
+	}
+
+
 	public int getAllNodeSize() {
 		return allNodeSize;
 	}
@@ -27,12 +38,6 @@ public class Net {
 		this.allNodeSize = allNodeSize;
 	}
 
-	public boolean[][] getConected() {
-		return conected;
-	}
-	public void setConected(boolean[][] conected) {
-		this.conected = conected;
-	}
 	public List<CostNode> getCostNodes() {
 		return costNodes;
 	}
