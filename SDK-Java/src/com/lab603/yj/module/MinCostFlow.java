@@ -22,6 +22,8 @@ import com.lab603.yj.util.Pair;
 @SuppressWarnings("serial")
 public class MinCostFlow implements Serializable{
 
+	private static final int sinkOutValue = 6666;
+	
 	private Net net;
 	
 	private int INF = 0x3f3f3f3f;
@@ -29,7 +31,7 @@ public class MinCostFlow implements Serializable{
 	private int totalFlow = 0; 	
 	
 	// MAX node number
-	private static int MAX_V = 2000;
+	private static int MAX_V = 10000;
 
 	// Node number
 	private int nodeNum;
@@ -57,11 +59,11 @@ public class MinCostFlow implements Serializable{
 
 	
 	public Object deepClone() throws IOException, OptionalDataException, ClassNotFoundException {
-		// 将对象写到流里
+		// 灏嗗璞″啓鍒版祦閲�
 		ByteArrayOutputStream bo = new ByteArrayOutputStream();
 		ObjectOutputStream oo = new ObjectOutputStream(bo);
 		oo.writeObject(this);
-		// 从流里读出来
+		// 浠庢祦閲岃鍑烘潵
 		ByteArrayInputStream bi = new ByteArrayInputStream(bo.toByteArray());
 		ObjectInputStream oi = new ObjectInputStream(bi);
 		return (oi.readObject());
@@ -116,16 +118,16 @@ public class MinCostFlow implements Serializable{
 	
 	public void setServer(List<Integer> serverIndex) {
 		serverNum = serverIndex.size();
-		superSource = netStates + consumeStates;
+ 		superSource = netStates + consumeStates;
 		superSink = superSource + 1;
 		
 		for (int i = 0; i < serverNum; i++) {
-			add_edge(superSource, serverIndex.get(i), 600, 0);
-			add_edge(serverIndex.get(i), superSource, 600, 0);
+			add_edge(superSource, serverIndex.get(i), sinkOutValue, 0);
+			add_edge(serverIndex.get(i), superSource, sinkOutValue, 0);
 		}
 		for (int i = netStates; i < netStates + consumeStates; i++) {
-			add_edge(superSink, i, 600, 0);
-			add_edge(i, superSink, 600, 0);
+			add_edge(superSink, i, sinkOutValue, 0);
+			add_edge(i, superSink, sinkOutValue, 0);
 		}
 	}
 	
@@ -174,12 +176,15 @@ public class MinCostFlow implements Serializable{
 			// The shortest path from s to t is augmented
 			int d = totalFlow;
 
-			List<Integer> shortIndex = new ArrayList<>();
+			List<Integer> shortIndex = new ArrayList<Integer>();
 			/* Compared with the minimum capacity of the residual demand flow
 			 and the shortest path, the minimum is the augmented flow*/
 			for (int v = superSink; v != superSource; v = prevv[v]) {
-				if (d > G.get(prevv[v]).get(preve[v]).getCap())
+				
+				if (d > G.get(prevv[v]).get(preve[v]).getCap()) {
 					d = G.get(prevv[v]).get(preve[v]).getCap();
+				}
+					
 				// save shortest path
 				if (v != superSink) {
 					shortIndex.add(v);
@@ -195,7 +200,7 @@ public class MinCostFlow implements Serializable{
 			for (int v = superSink; v != superSource; v = prevv[v]) {
 				Edge e = G.get(prevv[v]).get(preve[v]);
 				e.setCap(e.getCap() - d);
-				G.get(v).get(e.getRev()).setCap(G.get(v).get(e.getRev()).getCap() + d);
+//				G.get(v).get(e.getRev()).setCap(G.get(v).get(e.getRev()).getCap() + d);
 			}
 
 		}

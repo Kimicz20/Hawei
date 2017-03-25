@@ -16,9 +16,9 @@ public class MinPath {
 	// init 
 	public MinPath(Net net) {
 		this.net = net;
-		minSetpMap = new HashMap<>(net.getAllNodeSize());
+		minSetpMap = new HashMap<Integer, HashMap<Integer, MinStep>>(net.getAllNodeSize());
 		List<Tran> trans = net.getTrans();
-		stepLenth = new HashMap<>(net.getAllNodeSize());
+		stepLenth = new HashMap<Integer, HashMap<Integer, Integer>>(net.getAllNodeSize());
 		
 		for (Tran tran : trans) {
 			int fromId = tran.getFromNodeID();

@@ -21,7 +21,7 @@ public class TransStringToModule {
 		int costNodeCount = Integer.valueOf(countString[2]);
 		
 		// set nodes first
-		ArrayList<Node> nodes = new ArrayList<>(nodeCount);
+		ArrayList<Node> nodes = new ArrayList<Node>(nodeCount);
 		for(int i = 0; i < nodeCount; i++) {
 			Node node = new Node(i);
 			nodes.add(node);
@@ -31,7 +31,7 @@ public class TransStringToModule {
 		int serverCost = Integer.valueOf(input[index++]);
 		index++;
 		
-		ArrayList<Tran> trans = new ArrayList<>(tranCount);
+		ArrayList<Tran> trans = new ArrayList<Tran>(tranCount);
 		for(; index < 4 + tranCount; index ++) {
 			String[] tranDataString = input[index].split(" ");
 			int fromNodeID = Integer.valueOf(tranDataString[0]);
@@ -47,7 +47,7 @@ public class TransStringToModule {
 		
 		int totalResquestValue = 0;
 		index++;
-		ArrayList<CostNode> costNodes = new ArrayList<>(costNodeCount);
+		ArrayList<CostNode> costNodes = new ArrayList<CostNode>(costNodeCount);
 		for(; index < 5 + tranCount + costNodeCount; index++) {
 			String[] costNodeDataString = input[index].split(" ");
 			int id = Integer.valueOf(costNodeDataString[0]) + nodeCount;

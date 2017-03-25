@@ -32,7 +32,7 @@ public class DistanceDijkstraImpl implements Distance{
     }  
     
     public ArrayList<MinStep> getAllMinSetp(int countOfNode) {
-    	ArrayList<MinStep> res = new ArrayList<>();
+    	ArrayList<MinStep> res = new ArrayList<MinStep>();
     	for(int i = 0; i < countOfNode; i++) {
     		 if (nodeStep.containsKey(i)) {
 				res.add(changeToMinStep(i));
