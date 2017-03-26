@@ -7,22 +7,25 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import com.lab603.chenzuo.util.GACriterion;
 import com.lab603.chenzuo.util.GAUtil;
+import com.lab603.module.CostNode;
+import com.lab603.module.Net;
+import com.lab603.module.ResultPathsAndCost;
 
 public class GeneticAlgorithm {
 
-	private int scale; // 种群规模，种群规模是指任意一代中的个体总数
-	private int MAX_GEN; // 运行代数
-	private int bestT; // 最佳出现代数
-	private int cityNum;
-	private int[] fitness;// 种群适应度，表示种群中各个个体的适应度
-	private float[] Pi;// 种群中各个个体的累计概率
-	private float Pc;// 交叉概率
-	private float Pm;// 变异概率
-	private int t;// 当前代数
+	GACriterion criterion;
+
+	static int bestT; 			// 最佳出现代数
+	static int nodesNum;		// 服务器节点数目
+	static int[] fitness;		// 种群适应度，表示种群中各个个体的适应度
+	static float[] Pi;			// 种群中各个个体的累计概率
+
+	static int t;				// 当前代数
 	Random random = null;
 	
-	private Net net = new Net();
+	private Net net;
 	
 	// 初始种群
 	private List<Chromosome> oldPopulation = null;
@@ -30,42 +33,23 @@ public class GeneticAlgorithm {
 	private List<Chromosome> newPopulation = null;
 
 
-	public GeneticAlgorithm() {
+	public GeneticAlgorithm(Net net,GACriterion criterion) {
+		this.net = net;
+		this.criterion = criterion;
 	}
 
-	/**
-	 * constructor of GA
-	 * 
-	 * @param s
-	 *            种群规模
-	 * @param g
-	 *            运行代数
-	 * @param c
-	 *            交叉率
-	 * @param m
-	 *            变异率
-	 * 
-	 **/
-	public GeneticAlgorithm(int s, int g, float c, float m) {
-		scale = s;
-		MAX_GEN = g;
-		Pc = c;
-		Pm = m;
-	}
 
 	public void init(String filename) throws IOException {
 		
-		//初始化距离矩阵以及参数信息
-		net.init(filename);
 		//初始化城市数目
-		cityNum = net.getCityNum();
+		nodesNum = net.getNodes().size();
 		bestT = 0;
 		t = 0;
 		random = new Random(System.currentTimeMillis());
 		oldPopulation = new ArrayList<Chromosome>();
 		newPopulation = new ArrayList<Chromosome>();
-		Pi = new float[scale];
-		fitness = new int[scale];
+		Pi = new float[criterion.getSCALE()];
+		fitness = new int[criterion.getSCALE()];
 	}
 
 	/**
@@ -73,8 +57,14 @@ public class GeneticAlgorithm {
 	 * @Description: 初始化种群
 	 */
 	private void initGroup() {
-		for (int i = 0; i < scale; i++) {
-			Chromosome chro = new Chromosome(net.getCityNum());
+		for (int i = 0; i < criterion.getSCALE(); i++) {
+			List<Integer> ids = new ArrayList<Integer>();
+			//first put nodesNum
+			ids.add(nodesNum);
+			for (CostNode costNode : net.getCostNodes()) {
+				ids.add(costNode.getLinkedNodeId());
+			}
+			Chromosome chro = new Chromosome(ids);
 			oldPopulation.add(chro);
 		}
 	}
@@ -83,18 +73,25 @@ public class GeneticAlgorithm {
 	 * @Author:kimi
 	 * @Description:种群进行遗传
 	 */
-	public void evolve() {
+	public ResultPathsAndCost evolve() {
+		
+		ResultPathsAndCost pathsAndCost = new ResultPathsAndCost();
+		
 		// 1.初始化种群
 		initGroup();
+		
 		// 2.计算种群适应度
-		fitness = GAUtil.evaluateFitness(scale, net, oldPopulation);
+		fitness = GAUtil.evaluateFitness(criterion.getSCALE(), net, oldPopulation);
+		
 		// 3.计算种群中各个个体的累积概率
-		Pi = GAUtil.evaluateRate(scale,fitness, oldPopulation);
+		Pi = GAUtil.evaluateRate(criterion.getSCALE(),fitness, oldPopulation);
 		System.out.println("初始种群...");
-//		for (int k = 0; k < scale; k++) {
+		
+//		for (int k = 0; k < criterion.getSCALE(); k++) {
 //			System.out.println(oldPopulation.get(k));
 //			System.out.println("----" + fitness[k] + " " + Pi[k]);
 //		}
+		
 		// 4.遗传迭代
 		for (t = 0; t < MAX_GEN; t++) {
 			// 4.1 生成下一代种群
@@ -107,11 +104,11 @@ public class GeneticAlgorithm {
 			}
 			newPopulation.clear();
 			// 4.3 计算种群适应度
-			fitness = GAUtil.evaluateFitness(scale, net, oldPopulation);
+			fitness = GAUtil.evaluateFitness(criterion.getSCALE(), net, oldPopulation);
 			// 4.4 计算种群中各个个体的累积概率
-			Pi = GAUtil.evaluateRate(scale,fitness, oldPopulation);
+			Pi = GAUtil.evaluateRate(criterion.getSCALE(),fitness, oldPopulation);
 		}
-		printf();
+		return pathsAndCost;
 	}
 	
 	/**
@@ -124,13 +121,13 @@ public class GeneticAlgorithm {
 		// 挑选某代种群中适应度最高的个体
 		selectBestGh();
 
-		// 赌轮选择策略挑选scale-1个下一代个体
+		// 赌轮选择策略挑选criterion.getSCALE()-1个下一代个体
 		select();
 
 		// Random random = new Random(System.currentTimeMillis());
 		float r;
 
-		for (k = 1; k + 1 < scale / 2; k = k + 2) {
+		for (k = 1; k + 1 < criterion.getSCALE() / 2; k = k + 2) {
 			r = random.nextFloat();// /产生概率
 			if (r < Pc) {
 				OXCross(k, k + 1);// 进行交叉
@@ -147,7 +144,7 @@ public class GeneticAlgorithm {
 				}
 			}
 		}
-		if (k == scale / 2 - 1)// 剩最后一个染色体没有交叉L-1
+		if (k == criterion.getSCALE() / 2 - 1)// 剩最后一个染色体没有交叉L-1
 		{
 			r = random.nextFloat();// /产生概率
 			if (r < Pm) {
@@ -165,7 +162,7 @@ public class GeneticAlgorithm {
 
 		maxid = 0;
 		maxevaluation = oldPopulation.get(0).getScore();
-		for (k = 1; k < scale; k++) {
+		for (k = 1; k < criterion.getSCALE(); k++) {
 			if (maxevaluation > oldPopulation.get(k).getScore()) {
 				maxevaluation = oldPopulation.get(k).getScore();
 				maxid = k;
@@ -175,7 +172,7 @@ public class GeneticAlgorithm {
 		if (net.getBestLength() > maxevaluation) {
 			net.setBestLength(maxevaluation);
 			bestT = t; // 最好的染色体出现的代数;
-			for (i = 0; i < cityNum; i++) {
+			for (i = 0; i < nodesNum; i++) {
 				net.setBestTourAtIndex(i, oldPopulation.get(maxid).getGene()[i]);
 			}
 		}
@@ -188,11 +185,11 @@ public class GeneticAlgorithm {
 	public void select() {
 		int k, i, selectId;
 		float ran1;
-		for (k = 1; k < scale; k++) {
+		for (k = 1; k < criterion.getSCALE(); k++) {
 			ran1 = (float) (random.nextInt(65535) % 1000 / 1000.0);
 			// System.out.println("概率"+ran1);
 			// 产生方式
-			for (i = 0; i < scale; i++) {
+			for (i = 0; i < criterion.getSCALE(); i++) {
 				if (ran1 <= Pi[i]) {
 					break;
 				}
@@ -206,14 +203,14 @@ public class GeneticAlgorithm {
 	public void OXCross(int k1, int k2) {
 		int i, j, k, flag;
 		int ran1, ran2, temp;
-		int[] Gh1 = new int[cityNum];
-		int[] Gh2 = new int[cityNum];
+		int[] Gh1 = new int[nodesNum];
+		int[] Gh2 = new int[nodesNum];
 		// Random random = new Random(System.currentTimeMillis());
 
-		ran1 = random.nextInt(65535) % cityNum;
-		ran2 = random.nextInt(65535) % cityNum;
+		ran1 = random.nextInt(65535) % nodesNum;
+		ran2 = random.nextInt(65535) % nodesNum;
 		while (ran1 == ran2) {
-			ran2 = random.nextInt(65535) % cityNum;
+			ran2 = random.nextInt(65535) % nodesNum;
 		}
 
 		if (ran1 > ran2)// 确保ran1<ran2
@@ -224,13 +221,13 @@ public class GeneticAlgorithm {
 		}
 
 		// 将染色体1中的第三部分移到染色体2的首部
-		for (i = 0, j = ran2; j < cityNum; i++, j++) {
+		for (i = 0, j = ran2; j < nodesNum; i++, j++) {
 			Gh2[i] = newPopulation.get(k1).getGene()[j];
 		}
 
 		flag = i;// 染色体2原基因开始位置
 
-		for (k = 0, j = flag; j < cityNum;)// 染色体长度
+		for (k = 0, j = flag; j < nodesNum;)// 染色体长度
 		{
 			Gh2[j] = newPopulation.get(k2).getGene()[k++];
 			for (i = 0; i < flag; i++) {
@@ -244,7 +241,7 @@ public class GeneticAlgorithm {
 		}
 
 		flag = ran1;
-		for (k = 0, j = 0; k < cityNum;)// 染色体长度
+		for (k = 0, j = 0; k < nodesNum;)// 染色体长度
 		{
 			Gh1[j] = newPopulation.get(k1).getGene()[k++];
 			for (i = 0; i < flag; i++) {
@@ -257,13 +254,13 @@ public class GeneticAlgorithm {
 			}
 		}
 
-		flag = cityNum - ran1;
+		flag = nodesNum - ran1;
 
-		for (i = 0, j = flag; j < cityNum; j++, i++) {
+		for (i = 0, j = flag; j < nodesNum; j++, i++) {
 			Gh1[j] = newPopulation.get(k2).getGene()[i];
 		}
 
-		for (i = 0; i < cityNum; i++) {
+		for (i = 0; i < nodesNum; i++) {
 			newPopulation.get(k1).getGene()[i] = Gh1[i];// 交叉完毕放回种群
 			newPopulation.get(k2).getGene()[i] = Gh2[i];// 交叉完毕放回种群
 		}
@@ -274,14 +271,14 @@ public class GeneticAlgorithm {
 		int ran1, ran2, temp;
 		int count;// 对换次数
 
-		count = random.nextInt(65535) % cityNum;
+		count = random.nextInt(65535) % nodesNum;
 
 		for (int i = 0; i < count; i++) {
 
-			ran1 = random.nextInt(65535) % cityNum;
-			ran2 = random.nextInt(65535) % cityNum;
+			ran1 = random.nextInt(65535) % nodesNum;
+			ran2 = random.nextInt(65535) % nodesNum;
 			while (ran1 == ran2) {
-				ran2 = random.nextInt(65535) % cityNum;
+				ran2 = random.nextInt(65535) % nodesNum;
 			}
 			temp = newPopulation.get(k).getGene()[ran1];
 			newPopulation.get(k).getGene()[ran1] = newPopulation.get(k).getGene()[ran2];

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.lab603.chenzuo.module.GeneticAlgorithm;
+import com.lab603.chenzuo.util.GACriterion;
 import com.lab603.jun.util.ServerNodeSet;
 import com.lab603.jun.util.ServerNodeSetV2;
 import com.lab603.module.CostNode;
@@ -15,6 +17,7 @@ import com.lab603.module.ResultPathsAndCost;
 import com.lab603.yj.module.MinCostFlow;
 
 public class getResult {
+	
 	// main algorithm
 	public static String[] formNet(Net net) {
 		int best = Integer.MAX_VALUE;
@@ -69,6 +72,17 @@ public class getResult {
 	}
 
 
+	public static String[] formNetWithGA(Net net) {
+		
+		//make criterion 
+		GeneticAlgorithm GA = new GeneticAlgorithm(net,new GACriterion(30, 0.8f, 0.9f, 8000, 1000));
+		
+		//GA 
+		ResultPathsAndCost bestGroupInTime = GA.evolve();
+		
+		return transReultToStrings(bestGroupInTime);
+	}
+
 
 
 
@@ -81,10 +95,6 @@ public class getResult {
 		return res;
 	}
 
-
-
-
-
 	private static List<Integer> addIdsFromServerNodes(List<Node> serverNodes) {
 		List<Integer> res = new ArrayList<Integer>();
 		for (Node node : serverNodes) {
@@ -94,7 +104,6 @@ public class getResult {
 	}
 
 	private static String[] transReultToStrings(ResultPathsAndCost resultPathsAndCost) {
-		// System.out.println(resultPathsAndCost);
 		return resultPathsAndCost.result();
 	}
 }
