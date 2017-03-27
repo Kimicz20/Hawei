@@ -205,6 +205,7 @@ public class GeneticAlgorithm {
 			System.err.println("k:"+k+" ,j:"+j);
 			Gh2[j] = newPopulation.get(k2).getGene()[k++];
 			for (i = 0; i < flag; i++) {
+				System.out.println();
 				if (Gh2[i] == Gh2[j]) {
 					break;
 				}
