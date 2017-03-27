@@ -11,7 +11,8 @@ public class Deploy
     public static String[] deployServer(String[] graphContent)
     {
     	Net net = TransStringToModule.fromStrings(graphContent);
-        return getResult.formNet(net);
+//        return getResult.formNet(net);
+    	return getResult.formNetWithGA(net);
     }
 
 }

@@ -44,7 +44,6 @@ public class getResult {
 				
 			}
 			 
-			
 			// 4.set
 			MinCostFlow m = new MinCostFlow(net);
 			m.TransNet2Flow();
@@ -71,7 +70,7 @@ public class getResult {
 		return transReultToStrings(resultPathsAndCost);
 	}
 
-
+	//GA 
 	public static String[] formNetWithGA(Net net) {
 		
 		//make criterion 
@@ -82,8 +81,6 @@ public class getResult {
 		
 		return transReultToStrings(bestGroupInTime);
 	}
-
-
 
 
 	public static List<Integer> allLinkedNodesIds(Net net) {

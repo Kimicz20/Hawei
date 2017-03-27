@@ -1,7 +1,9 @@
 package com.lab603.chenzuo.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import com.lab603.chenzuo.module.Chromosome;
 import com.lab603.module.Net;
 import com.lab603.module.ResultPathsAndCost;
@@ -10,13 +12,6 @@ import com.lab603.yj.module.MinCostFlow;
 public class GAUtil {
 	
 	
-	/**
-	 * 计算种群适应度
-	 * @param scale
-	 * @param net
-	 * @param oldPopulation
-	 * @return
-	 */
 	public static int[] evaluateFitness(Net net, List<Chromosome> oldPopulation){
 		
 		int[] fitness = new int[oldPopulation.size()];
@@ -26,27 +21,28 @@ public class GAUtil {
 			int[] gene = chromosome.getGene();
 			
 			//2.put servers
-			List ids = Arrays.asList(gene);
+			List<Integer> ids = new ArrayList<Integer>();
+			for(int i=0;i<gene.length;i++)
+				if(gene[i] == 1)
+					ids.add(i);
 			MinCostFlow m = new MinCostFlow(net);
 			m.TransNet2Flow();
 			m.setServer(ids);
 			
 			//3.cacluate min_cost_flow
 			ResultPathsAndCost tempResult = m.min_cost_flow();
-			chromosome.setScore(tempResult.getCosts());
+			chromosome.setPathsAndCost(tempResult);
 			fitness[k++] = tempResult.getCosts();
 		}
+		
 		return fitness;
 	}
 	
-	/**
-	 * @Author:kimi
-	 * @Description: 计算种群中各个个体的累积概率， 前提是已经计算出各个个体的适应度fitness[max]
-	 *               作为赌轮选择策略一部分，Pi[max]
-	 */
-	public static float[] evaluateRate(int scale ,int[] fitness, List<Chromosome> oldPopulation) {
-		int k;
-		double sumFitness = 0;// 适应度总和
+	
+	public static float[] evaluateRate(int[] fitness, List<Chromosome> oldPopulation) {
+		
+		int k,scale=oldPopulation.size();
+		double sumFitness = 0;
 		float[] Pi = new float[scale];
 		double[] tempf = new double[scale];
 
