@@ -29,7 +29,7 @@ public class ResultPathsAndCost {
 	}
 
 	public String[] result(){
-		
+		System.err.println("费用"+costs);
 		String[] result = new String[paths.size()+2];
 		result[0] = paths.size()+"";
 		result[1] = "";

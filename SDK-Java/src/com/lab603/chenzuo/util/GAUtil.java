@@ -1,7 +1,7 @@
 package com.lab603.chenzuo.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.lab603.chenzuo.module.Chromosome;
@@ -11,7 +11,14 @@ import com.lab603.yj.module.MinCostFlow;
 
 public class GAUtil {
 	
-	
+	//evaluate one Fitness
+	public static ResultPathsAndCost evaluateOneFitness(Net net, Chromosome chromosome){
+		MinCostFlow m = new MinCostFlow(net);
+		m.TransNet2Flow();
+		m.setServer(chromosome.getServersId());
+		return m.min_cost_flow();
+	}
+	//evaluate all Fitness
 	public static int[] evaluateFitness(Net net, List<Chromosome> oldPopulation){
 		
 		int[] fitness = new int[oldPopulation.size()];
@@ -21,13 +28,10 @@ public class GAUtil {
 			int[] gene = chromosome.getGene();
 			
 			//2.put servers
-			List<Integer> ids = new ArrayList<Integer>();
-			for(int i=0;i<gene.length;i++)
-				if(gene[i] == 1)
-					ids.add(i);
+
 			MinCostFlow m = new MinCostFlow(net);
 			m.TransNet2Flow();
-			m.setServer(ids);
+			m.setServer(chromosome.getServersId());
 			
 			//3.cacluate min_cost_flow
 			ResultPathsAndCost tempResult = m.min_cost_flow();
@@ -38,16 +42,17 @@ public class GAUtil {
 		return fitness;
 	}
 	
-	
+	// evaluate Pi
 	public static float[] evaluateRate(int[] fitness, List<Chromosome> oldPopulation) {
 		
 		int k,scale=oldPopulation.size();
-		double sumFitness = 0;
+		int sumFitness = 0;
 		float[] Pi = new float[scale];
+		
 		double[] tempf = new double[scale];
 
 		for (k = 0; k < scale; k++) {
-			tempf[k] = 10.0 / fitness[k];
+			tempf[k] = fitness[k];
 			sumFitness += tempf[k];
 		}
 
@@ -56,5 +61,14 @@ public class GAUtil {
 			Pi[k] = (float) (tempf[k] / sumFitness + Pi[k - 1]);
 		}
 		return Pi;
+	}
+	
+	private static int getBestCost(List<Chromosome> oldPopulation) {
+		List<Integer> costs = new ArrayList<>();
+		for (Chromosome f : oldPopulation) {
+				costs.add(f.getPathsAndCost().getCosts());
+		}
+		Collections.sort(costs);
+		return costs.get(0);
 	}
 }

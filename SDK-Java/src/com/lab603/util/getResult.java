@@ -1,14 +1,9 @@
 package com.lab603.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import com.lab603.chenzuo.module.GeneticAlgorithm;
 import com.lab603.chenzuo.util.GACriterion;
-import com.lab603.jun.util.ServerNodeSet;
 import com.lab603.jun.util.ServerNodeSetV2;
 import com.lab603.module.CostNode;
 import com.lab603.module.Net;
@@ -74,14 +69,13 @@ public class getResult {
 	public static String[] formNetWithGA(Net net) {
 		
 		//make criterion 
-		GeneticAlgorithm GA = new GeneticAlgorithm(net,new GACriterion(30, 0.8f, 0.9f, 8000, 1000));
+		GeneticAlgorithm GA = new GeneticAlgorithm(net,new GACriterion(40, 0.9f,0.9f, 100000, 40));
 		
 		//GA 
 		ResultPathsAndCost bestGroupInTime = GA.evolve();
 		
 		return transReultToStrings(bestGroupInTime);
 	}
-
 
 	public static List<Integer> allLinkedNodesIds(Net net) {
 		
