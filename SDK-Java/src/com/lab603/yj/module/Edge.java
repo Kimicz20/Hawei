@@ -1,11 +1,13 @@
 package com.lab603.yj.module;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author geek
  *	终点、容量、费用、反向边
  */
-public class Edge {
+public class Edge implements Serializable{
 	private int	to ;
 	private int	cap ;
 	private int	cost ;

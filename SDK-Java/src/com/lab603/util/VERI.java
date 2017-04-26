@@ -16,12 +16,10 @@ public class VERI {
 	public static boolean verification(ResultPathsAndCost resultPathsAndCost, Net net) {
 		NET = net;
 		int liu = NET.getTotalRequestValue();
-		// 
 		setTranHash();
 		List<List<Integer>> paths = resultPathsAndCost.getPaths();
 		for (List<Integer> path : paths) {
 			for(int i = 1; i < path.size() - 1; i++) {
-				
 				if (i == path.size() - 2) {
 					if (!goTran(path.get(i-1), path.get(i)+NET.getNodes().size(), path.get(path.size() - 1))) {
 						return false;
@@ -41,7 +39,7 @@ public class VERI {
 			sum += path.get(path.size() - 1);
 		}
 		if (sum != liu) {
-			System.out.println("==============Á÷Á¿²»×ã");
+			System.out.println("======æ€»æµä¸å¤Ÿ========");
 			return false;
 		}
 		
@@ -55,9 +53,6 @@ public class VERI {
 		for (Tran tran : NET.getTrans()) {// go back tran
 			Tran newT = new Tran(tran.getToNodeID(), tran.getFromNodeID(), tran.getMaxValue(), tran.getCostValue());
 			newTs.add(newT);
-//			if (newT.getFromNodeID() == 270 && newT.getToNodeID() == 585) {
-//				System.out.println(1);
-//			}
 		}
 		NET.getTrans().addAll(newTs);
 		for (CostNode costNode : NET.getCostNodes()) {
@@ -66,18 +61,12 @@ public class VERI {
 			int max = costNode.getRequestValue();
 			int cost = 0;
 			Tran tran1 = new Tran(from, to, max, cost);
-//			if (from == 270 && to == 585) {
-//				System.out.println(1);
-//			}
 			NET.getTrans().add(tran1);
 		}
 		
 		for (Tran tran : NET.getTrans()) { // set tran hash
 			int fromId = tran.getFromNodeID();
 			int toId = tran.getToNodeID();
-//			if (fromId == 270 && toId == 585) {
-//				System.out.println(1);
-//			}
 			HashMap<Integer, Tran> fromMap = 
 					tranHash.containsKey(fromId) ? tranHash.get(fromId) : new HashMap<Integer, Tran>();
 			fromMap.put(toId, tran);
@@ -88,26 +77,20 @@ public class VERI {
 	}
 
 	private static boolean goTran(Integer from, Integer to, Integer cost) {
-//		if (from == 3 && to == 13) {
-//			System.out.println(1);
-//		}
 		if (tranHash.containsKey(from)) {
 			if (tranHash.get(from).containsKey(to)) {
 				// exist
 				Tran tran = tranHash.get(from).get(to);
 				if (tran.getMaxValue() - cost < 0) {
-					System.out.println("================"+from + " " + to + "³¬Á÷");
+					System.out.println("================"+from + " " + to + "æµä¸è¶³");
 					return false;
 				} else {
-//					if (tran.getFromNodeID() == 270 && tran.getToNodeID() == 585) {
-//						System.out.println(1);
-//					}
 					tran.setMaxValue(tran.getMaxValue() - cost);
 					return true;
 				}
 			}
 		}
-		System.out.println("================"+from + " " + to + "²»´æÔÚ");
+		System.out.println("================"+from + " " + to + "è·¯å¾„ä¸å­˜åœ¨");
 		return false;
 	}
 }

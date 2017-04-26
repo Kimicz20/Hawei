@@ -1,0 +1,1 @@
+/usr/bin/c++    -O3 -Wall -std=c++11    CMakeFiles/cdn.dir/io.cpp.o CMakeFiles/cdn.dir/cdn.cpp.o CMakeFiles/cdn.dir/deploy.cpp.o CMakeFiles/cdn.dir/ga.cpp.o  -o /home/geek/桌面/CZ/v1.0/bin/cdn -rdynamic 

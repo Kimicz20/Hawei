@@ -181,6 +181,7 @@ public class GeneticAlgorithm {
 		for (k = 1; k < criterion.getSCALE(); k++) {
 			ran1 = (float) (random.nextInt(65535) % 1000 / 1000.0);
 			for (i = 0; i < criterion.getSCALE(); i++) {
+				System.out.println(ran1 +","+ Pi[i]);
 				if (ran1 <= Pi[i] && oldPopulation.get(i).getPathsAndCost().getCosts() > 0) {
 					break;
 				}

@@ -1,6 +1,8 @@
 package com.lab603.module;
 
-public class Tran {
+import java.io.Serializable;
+
+public class Tran implements Serializable{
 	int fromNodeID;
 	int toNodeID;
 	int maxValue;

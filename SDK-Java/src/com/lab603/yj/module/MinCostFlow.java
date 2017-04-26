@@ -1,11 +1,5 @@
 package com.lab603.yj.module;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,7 +37,7 @@ public class MinCostFlow implements Serializable{
 	int serverNum;
 	
 	// Graph array
-	List<List<Edge>> G;
+	public List<List<Edge>> G;
 
 	// Node h
 	int[] h = new int[MAX_V];
@@ -57,17 +51,6 @@ public class MinCostFlow implements Serializable{
 
 	List<List<Integer>> paths = new ArrayList<List<Integer>>();
 
-	
-	public Object deepClone() throws IOException, OptionalDataException, ClassNotFoundException {
-		// 灏嗗璞″啓鍒版祦閲�
-		ByteArrayOutputStream bo = new ByteArrayOutputStream();
-		ObjectOutputStream oo = new ObjectOutputStream(bo);
-		oo.writeObject(this);
-		// 浠庢祦閲岃鍑烘潵
-		ByteArrayInputStream bi = new ByteArrayInputStream(bo.toByteArray());
-		ObjectInputStream oi = new ObjectInputStream(bi);
-		return (oi.readObject());
-	}
 	
 	/***
 	 * add eage to Graph array
@@ -132,6 +115,7 @@ public class MinCostFlow implements Serializable{
 	}
 	
 	public ResultPathsAndCost min_cost_flow() {
+		long sTime = System.currentTimeMillis();
 		paths.clear();
 		int res = 0;
 
@@ -200,10 +184,12 @@ public class MinCostFlow implements Serializable{
 			for (int v = superSink; v != superSource; v = prevv[v]) {
 				Edge e = G.get(prevv[v]).get(preve[v]);
 				e.setCap(e.getCap() - d);
-//				G.get(v).get(e.getRev()).setCap(G.get(v).get(e.getRev()).getCap() + d);
+				G.get(v).get(e.getRev()).setCap(G.get(v).get(e.getRev()).getCap() + d);
 			}
 
 		}
+		long eTime = System.currentTimeMillis();
+		System.err.println("费用流耗时:"+(eTime-sTime));
 		return new ResultPathsAndCost(paths,res+serverNum*net.getServerCost());
 	}
 

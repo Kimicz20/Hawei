@@ -1,6 +1,8 @@
 package com.lab603.module;
 
-public class CostNode {
+import java.io.Serializable;
+
+public class CostNode implements Serializable{
 	
 	int id;
 	int linkedNodeId;

@@ -1,8 +1,9 @@
 package com.lab603.module;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Net {
+public class Net implements Serializable{
 	List<Node> nodes;
 	List<Tran> trans;
 	List<CostNode> costNodes;

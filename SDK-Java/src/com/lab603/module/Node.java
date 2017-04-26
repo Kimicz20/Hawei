@@ -1,7 +1,8 @@
 package com.lab603.module;
 
+import java.io.Serializable;
 
-public class Node implements Comparable<Node>{
+public class Node implements Comparable<Node>,Serializable{
 	int id;
 	int throughput;
 	int imp;

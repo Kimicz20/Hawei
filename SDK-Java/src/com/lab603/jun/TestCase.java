@@ -11,7 +11,7 @@ import com.lab603.module.Net;
 public class TestCase {
 	private static Net net;
 	public static void main(String args[]) throws IOException {
-		FileReader fr = new FileReader("case1.txt");
+		FileReader fr = new FileReader("case2.txt");
 		BufferedReader br = new BufferedReader(fr);
         String s;
         StringBuilder sb = new StringBuilder();
@@ -31,10 +31,9 @@ public class TestCase {
 	    
 	    
 		String[] out = Deploy.deployServer(input);///
-		
-		for (String string : out) {
-			System.out.println(string);
-		}
+//		for (String string : out) {
+//			System.out.println(string);
+//		}
 	}
 	
 }
